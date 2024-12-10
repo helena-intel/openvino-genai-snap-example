@@ -5,7 +5,7 @@ summary: OpenVINO GenAI demo snap
 description: |
   OpenVINO GenAI snap demo
 grade: devel
-confinement: strict
+confinement: classic
 
 apps:
   openvinodemo:
@@ -27,6 +27,7 @@ parts:
       - cmake
       - make
       - pkgconf
+      - intel-opencl-icd
     override-build: |
       #!/bin/bash
       set +u

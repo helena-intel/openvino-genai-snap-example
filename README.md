@@ -1,6 +1,7 @@
 # Create a Snap for an OpenVINO GenAI application
 
-This is a very basic example for building a snap for an OpenVINO GenAI C++ application. Tested on Ubuntu 24.04.
+This is a very basic example for building a snap for an OpenVINO GenAI C++ application. Tested on Ubuntu 24.04. The example in this branch works on GPU, but it needs to be installed
+with `snap install --classic`.
 
 More information:
 - https://snapcraft.io/
@@ -13,7 +14,6 @@ demo application is trivially simple and just runs a few tokens of inference on 
 
 ## Limitations
 
-- This example currently only works for OpenVINO inference on CPU.
 - The example can by default only access models that are in (a subdirectory of) the user's $HOME directory. See the _Allow other directories_ section to allow other specific directories. It is not possible to allow all paths.
 
 ## Prerequisites
@@ -73,8 +73,10 @@ If all goes well, this creates a file openvinodemo_0.1_amd64.snap in the current
 The `--dangerous` flag is needed because the app isn't signed by the Snap Store.
 See the [Create your first snap](https://ubuntu.com/tutorials/create-your-first-snap) tutorial (section 6 and 7).
 
+The `--classic` flag is needed for GPU support.
+
 ```shell
-sudo snap install --dangerous openvinodemo_0.1_amd64.snap
+sudo snap install --dangerous --classic openvinodemo_0.1_amd64.snap
 ```
 
 You can copy this snap to another machine, and install and run it there without configuring anything.
@@ -82,8 +84,11 @@ You can copy this snap to another machine, and install and run it there without 
 ## Run the demo
 
 ```shell
-openvinodemo modelpath
+openvinodemo modelpath device
 ```
+
+For example: `openvinodemo llama-3.2-1b-instruct-ov GPU`
+
 
 > [!NOTE]
 > If you do not have an OpenVINO LLM on your computer, you can download one by installing huggingface-hub `pip install huggingface-hub` and downloading

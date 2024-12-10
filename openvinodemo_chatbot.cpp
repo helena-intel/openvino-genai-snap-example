@@ -11,12 +11,12 @@
 std::string start_message = " <|start_header_id|>system<|end_header_id|>\n\n You are a helpful, respectful and honest assistant. Always answer as helpfully as possible, while being safe.  Your answers should not include any harmful, unethical, racist, sexist, toxic, dangerous, or illegal content. Please ensure that your responses are socially unbiased and positive in nature. Make sure that code is concise and correct.  If a question does not make any sense or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.<|eot_id|>";
 
 int main(int argc, char* argv[]) try {
-    if (2 != argc) {
-        throw std::runtime_error(std::string{"Usage: "} + argv[0] + " <MODEL_DIR>");
+    if (3 != argc) {
+        throw std::runtime_error(std::string{"Usage: "} + argv[0] + " <MODEL_DIR> <DEVICE>");
     }
     std::string prompt; 
     std::string models_path = argv[1];
-    std::string device = "CPU";
+    std::string device = argv[2];
     ov::genai::LLMPipeline pipe(models_path, device);
     
     ov::genai::GenerationConfig config = pipe.get_generation_config();

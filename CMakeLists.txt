@@ -40,4 +40,8 @@ install(FILES
       "${tbb_directory}/libhwloc.so.15.6.4"
       "${tbb_directory}/libhwloc.so.15"
       "${tbb_directory}/libhwloc.so"
+      "${lib_directory}/cache.json"
+      "${lib_directory}/libopenvino_intel_gpu_plugin.so"
+      "/usr/lib/x86_64-linux-gnu/libOpenCL.so.1"
+      "/usr/lib/x86_64-linux-gnu/libOpenCL.so.1.0.0"
 DESTINATION .)
