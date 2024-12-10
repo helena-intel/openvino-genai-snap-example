@@ -9,7 +9,7 @@ More information:
 ## About the example
 
 The example consists of three files: `CMakeLists.txt` and `openvinodemo.cpp` that make up the sample application, and `snap/snapcraft.yaml` that describes how to build the snap. The 
-demo application is trivially simple and just runs a few tokens of inference on an LLM.
+demo application is trivially simple and just runs a few tokens of inference on an LLM. For a more interesting application, rename openvinodemo_chatbot.cpp to openvinodemo.cpp. This creates a chatbot demo. The chatbot demo doesn't work with all models - models need to have a compatible chat template to work (For example: Llama 3.1 and 3.2 Instruct models).
 
 ## Limitations
 
@@ -20,16 +20,31 @@ demo application is trivially simple and just runs a few tokens of inference on 
 
 On a recent Ubuntu, `snap` itself should be installed. Follow the [Create your first Snap](https://ubuntu.com/tutorials/create-your-first-snap#2-getting-started) tutorial if it isn't.
 
-First install snapcraft:
+### Install and configure snapcraft and dependencies
 
 ```
 sudo snap install --classic snapcraft
 ```
 
+Install `lxd` and add your user to the `lxd` group:
+
+```shell
+sudo groupadd --force --system lxd
+sudo usermod -a -G lxd $USER
+newgrp lxd
+sudo snap install lxd
+sudo lxd init --auto
+```
+
+The [tutorial](https://ubuntu.com/tutorials/create-your-first-snap#3-building-a-snap-is-easy) says you may be asked about multipass. I never was, for me
+`lxd` was used by default.
+
+### Configure demo
+
 Clone this repository and download and uncompress the OpenVINO GenAI archive. This example uses OpenVINO 2024.5. For other OpenVINO
 versions, change CMakeLists.txt to match.
 
-Step-by-step for Ubuntu 24.04 (For Ubuntu 20.04 or 22.04 replace ubuntu24 with ubuntu20/ubuntu22):
+Step-by-step:
 
 ```shell
 git clone https://github.com/helena-intel/openvino-genai-snap-example.git
@@ -51,7 +66,7 @@ If all goes well, this creates a file openvinodemo_0.1_amd64.snap in the current
 
 > [!NOTE]
 > If you get errors about network connectivity, like _A network related operation failed in a context of no network access_, it may be related to Docker. Working around that is
-> out of scope for this example; a suggestion is to (temporarily) remove Docker and reboot the machine.
+> out of scope for this example. `sudo iptables -P FORWARD ACCEPT` could work. Otherwise a suggestion is to (temporarily) remove Docker and reboot the machine.
 
 ## Install the snap
 
@@ -62,12 +77,12 @@ See the [Create your first snap](https://ubuntu.com/tutorials/create-your-first-
 sudo snap install --dangerous openvinodemo_0.1_amd64.snap
 ```
 
-You can copy this snap to another Ubuntu 24.04 machine, and install and run it there without configuring anything.
+You can copy this snap to another machine, and install and run it there without configuring anything.
 
 ## Run the demo
 
-```
-openvinodemo modelpath prompt CPU
+```shell
+openvinodemo modelpath
 ```
 
 > [!NOTE]
@@ -80,7 +95,7 @@ openvinodemo modelpath prompt CPU
 
 By default snap allows access to $HOME only. To allow other specific directories, for example `/data/models` you can run the following command on the system where you run the application:
 
-```
+```shell
 sudo snap set system homedirs=/data/models
 ```
 
@@ -101,6 +116,18 @@ cmake --build . --config Release
 cmake --install . --prefix "openvinodemo_install"
 ```
 
-### Snapcraft demo environment
+### Snapcraft debug environment
 
 Run `snapcraft --debug` instead of just `snapcraft` to launch a shell in the build environment.
+
+### Installing on a different Linux distribution
+
+If you install the snap on a Linux distro without snap installed by default, you can install snapd with `sudo apt install snapd`. If you then get
+connection refused errors, even after `systemctl start`, try this (from https://stackoverflow.com/questions/66008918/cannot-communicate-with-server-post-http-localhost-v2-snaps-discord-dial-uni):
+
+```shell
+sudo systemctl unmask snapd.service
+sudo systemctl enable snapd.service
+sudo systemctl start snapd.service
+```
+

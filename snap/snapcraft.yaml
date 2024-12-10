@@ -10,6 +10,10 @@ confinement: strict
 apps:
   openvinodemo:
     command: openvinodemo 
+    # To allow the application to find TBB libraries, you can set the
+    # LD_LIBRARY_PATH to the $SNAP directory, as below, or run
+    # `patchelf --set-rpath "\$ORIGIN"` for all OpenVINO and TBB libraries
+    # in the openvino_genai archive before building the snap
     environment:
       LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP
     plugs:

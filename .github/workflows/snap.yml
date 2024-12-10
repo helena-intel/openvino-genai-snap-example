@@ -1,0 +1,39 @@
+name: Build snap
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: 30 10 * * 1  # run Monday's at 10:30
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+
+    runs-on: "ubuntu-24.04"
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: download genai
+      run: |
+        curl -O https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2024.5/linux/openvino_genai_ubuntu24_2024.5.0.0_x86_64.tar.gz
+        tar zxf openvino_genai_ubuntu24_2024.5.0.0_x86_64.tar.gz
+        mv openvino_genai_ubuntu24_2024.5.0.0_x86_64 openvino_genai
+    - name: ls
+      run: |
+        ls
+    - run: |
+        mv openvinodemo_chatbot.cpp openvinodemo.cpp
+    - uses: snapcore/action-build@v1
+      id: snapcraft
+    - uses: actions/upload-artifact@v4
+      id: artifact-upload-step
+      with:
+        name: snap
+        path: ${{ steps.snapcraft.outputs.snap }}
+    - name: Output artifact URL
+      run:  echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'
