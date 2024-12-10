@@ -1,0 +1,33 @@
+name: openvinodemo 
+base: core24
+version: '0.1'
+summary: OpenVINO GenAI demo snap
+description: |
+  OpenVINO GenAI snap demo
+grade: devel
+confinement: strict
+
+apps:
+  openvinodemo:
+    command: openvinodemo 
+    environment:
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP
+    plugs:
+      - home
+
+parts:
+  openvinodemo:
+    plugin: cmake
+    source: .
+    build-packages: 
+      - cmake
+      - make
+      - pkgconf
+    override-build: |
+      #!/bin/bash
+      set +u
+      source $SNAPCRAFT_PART_SRC/openvino_genai/setupvars.sh
+      mkdir -p build && cd build
+      cmake -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL $SNAPCRAFT_PART_SRC
+      cmake --build . --config Release
+      cmake --install .
