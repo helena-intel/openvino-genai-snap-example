@@ -1,0 +1,73 @@
+name: openvinochat 
+base: core24
+version: '0.1'
+summary: OpenVINO GenAI demo
+description: |
+  OpenVINO GenAI chatbot demo
+grade: devel
+confinement: strict
+
+apps:
+  openvinochat:
+    command: openvinochat 
+    # To allow the application to find TBB libraries, you can set the
+    # LD_LIBRARY_PATH to the $SNAP directory, as below, or run
+    # `patchelf --set-rpath "\$ORIGIN"` for all OpenVINO and TBB libraries
+    # in the openvino_genai archive before building the snap
+    environment:
+      LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP
+    plugs:
+      - home
+      - opengl
+  modeldownload:
+    command: bin/huggingface-cli download llmware/llama-3.2-1b-instruct-ov --local-dir llmware-llama-3.2-1b-instruct-ov
+    plugs:
+      - home
+      - network
+
+# For Intel GPU support, from https://github.com/sergiusens/darktable-snap/pull/43/files
+layout:
+  /usr/lib/x86_64-linux-gnu/intel-opencl:
+    bind: $SNAP/usr/lib/x86_64-linux-gnu/intel-opencl
+
+parts:
+  openvino_genai:
+    plugin: nil
+    build-packages:
+    - curl
+    override-pull: |
+      curl --location --output ${CRAFT_PART_SRC}/openvino_genai.tar.gz https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2024.6/linux/openvino_genai_ubuntu24_2024.6.0.0_x86_64.tar.gz
+
+  openvinochat:
+    after: [openvino_genai]
+    plugin: cmake
+    source: .
+    build-packages: 
+      - cmake
+      - make
+      - pkgconf
+      - patchelf
+    override-build: |
+      #!/bin/bash
+      set +u
+      tar zxf ${CRAFT_PART_SRC}/../../openvino_genai/src/openvino_genai.tar.gz
+      source openvino_genai_ubuntu24_2024.6.0.0_x86_64/setupvars.sh
+      mkdir -p build && cd build
+      cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL $CRAFT_PART_SRC
+      cmake --build . --config Release
+      cmake --install .
+  
+  huggingface:
+    plugin: python
+    source: .
+    python-packages:
+      - huggingface-hub
+ 
+  opencl:
+    plugin: nil
+    stage-packages:
+      - intel-opencl-icd
+    override-build: |
+      set -eux
+      ln -rsf ${CRAFT_PART_INSTALL}/usr/lib/x86_64-linux-gnu/libOpenCL.so.1 ${CRAFT_PART_INSTALL}/usr/lib/x86_64-linux-gnu/libOpenCL.so
+      craftctl default

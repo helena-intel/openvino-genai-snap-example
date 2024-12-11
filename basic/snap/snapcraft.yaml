@@ -30,8 +30,8 @@ parts:
     override-build: |
       #!/bin/bash
       set +u
-      source $SNAPCRAFT_PART_SRC/openvino_genai/setupvars.sh
+      source $CRAFT_PART_SRC/openvino_genai/setupvars.sh
       mkdir -p build && cd build
-      cmake -DCMAKE_INSTALL_PREFIX=$SNAPCRAFT_PART_INSTALL $SNAPCRAFT_PART_SRC
+      cmake -DCMAKE_INSTALL_PREFIX=$CRAFT_PART_INSTALL $CRAFT_PART_SRC
       cmake --build . --config Release
       cmake --install .

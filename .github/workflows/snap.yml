@@ -20,20 +20,34 @@ jobs:
     - uses: actions/checkout@v4
     - name: download genai
       run: |
-        curl -O https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2024.5/linux/openvino_genai_ubuntu24_2024.5.0.0_x86_64.tar.gz
-        tar zxf openvino_genai_ubuntu24_2024.5.0.0_x86_64.tar.gz
-        mv openvino_genai_ubuntu24_2024.5.0.0_x86_64 openvino_genai
+        curl -O https://storage.openvinotoolkit.org/repositories/openvino_genai/packages/2024.6/linux/openvino_genai_ubuntu24_2024.6.0.0_x86_64.tar.gz
+        tar zxf openvino_genai_ubuntu24_2024.6.0.0_x86_64.tar.gz
+        mv openvino_genai_ubuntu24_2024.6.0.0_x86_64 openvino_genai
+        # ln -s fails
+        cp -r openvino_genai basic
+        cp -r openvino_genai chatbot
     - name: ls
       run: |
         ls
-    - run: |
-        mv openvinodemo_chatbot.cpp openvinodemo.cpp
     - uses: snapcore/action-build@v1
-      id: snapcraft
+      id: snapcraft_basic
+      name: snapcraft_basic
+      with:
+        path: ./basic
+    - uses: snapcore/action-build@v1
+      id: snapcraft_chatbot
+      name: snapcraft_chatbot
+      with:
+        path: ./chatbot
+    - uses: snapcore/action-build@v1
+      id: snapcraft_plus
+      name: snapcraft_plus
+      with:
+        path: ./chatbot_plus
     - uses: actions/upload-artifact@v4
       id: artifact-upload-step
       with:
         name: snap
-        path: ${{ steps.snapcraft.outputs.snap }}
+        path: ${{ steps.snapcraft_plus.outputs.snap }}
     - name: Output artifact URL
       run:  echo 'Artifact URL is ${{ steps.artifact-upload-step.outputs.artifact-url }}'
