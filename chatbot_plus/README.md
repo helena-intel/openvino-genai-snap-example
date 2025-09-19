@@ -58,7 +58,7 @@ enable these plugs, we add them to the snapcraft.yaml. If the application is ins
 is enough. The plugs will be autoconnected, and GPU and network will automatically work. This is not the case when
 testing locally after installing with `--dangerous` as we have been doing in the basic examples. There are two options:
 
-  1. Install the snap with `sudo snap install --dangerous openvinochat_0.1_amd64.snap` as before and then run `sudo snap connect openvinodemo:network` and `sudo snap connect openvinodemo:opengl`
+  1. Install the snap with `sudo snap install --dangerous openvinochat_0.1_amd64.snap` as before and then run `sudo snap connect openvinochat:network` and `sudo snap connect openvinochat:opengl`
   2. Install the snap with `sudo snap install --devmode openvinochat_0.1_amd64.snap`. With `--devmode` the snap gets full access to system resources. See https://snapcraft.io/docs/install-modes.
 
 The first method is the safer method. It runs the snap as intended, and you immediately notice any issues. You only have
